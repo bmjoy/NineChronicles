@@ -188,7 +188,7 @@ namespace Nekoyume.UI
             if (RankLoadingTask.IsFaulted)
             {
                 Debug.LogError($"Error loading ranking. Exception : \n{RankLoadingTask.Exception}\n{RankLoadingTask.Exception.StackTrace}");
-                emptyText.text = L10nManager.Localize("UI_RANKING_PRELOAD_FAILED");
+                emptyText.text = L10nManager.Localize("UI_RANKING_API_ERROR");
                 return;
             }
 
