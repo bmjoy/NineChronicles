@@ -171,6 +171,14 @@ namespace Nekoyume.UI
 
         private async void UpdateCategoryAsync(RankCategory category, bool toggleOn)
         {
+            if (category == RankCategory.Weapon)
+            {
+                Find<SystemPopup>().Show("UI_ALERT_NOT_IMPLEMENTED_TITLE", "UI_ALERT_NOT_IMPLEMENTED_CONTENT");
+                CurrentCategory = _previousCategory;
+                ToggleCategory(CurrentCategory);
+                return;
+            }
+
             if (toggleOn)
             {
                 ToggleCategory(category);
@@ -180,6 +188,7 @@ namespace Nekoyume.UI
             if (RankLoadingTask.IsFaulted)
             {
                 Debug.LogError($"Error loading ranking. Exception : \n{RankLoadingTask.Exception}\n{RankLoadingTask.Exception.StackTrace}");
+                emptyText.text = L10nManager.Localize("UI_RANKING_PRELOAD_FAILED");
                 return;
             }
 
@@ -190,24 +199,22 @@ namespace Nekoyume.UI
             }
 
             var states = States.Instance;
-
-            if (states.CurrentAvatarState is null)
-            {
-                return;
-            }
-
             var isApiLoaded = SharedModel.IsInitialized;
             emptyObject.SetActive(!isApiLoaded);
             if (!isApiLoaded)
             {
                 emptyText.text = L10nManager.Localize("UI_RANKING_API_MISSING");
                 myInfoCell.SetEmpty(states.CurrentAvatarState);
-                return;
             }
 
             switch (category)
             {
                 case RankCategory.Ability:
+                    if (!isApiLoaded)
+                    {
+                        break;
+                    }
+
                     var abilityRankingInfos = SharedModel.AbilityRankingInfos;
                     if (SharedModel.AgentAbilityRankingInfos
                         .TryGetValue(states.CurrentAvatarKey, out var abilityInfo))
@@ -222,6 +229,11 @@ namespace Nekoyume.UI
                     rankScroll.Show(abilityRankingInfos, true);
                     break;
                 case RankCategory.Stage:
+                    if (!isApiLoaded)
+                    {
+                        break;
+                    }
+
                     var stageRankingInfos = SharedModel.StageRankingInfos;
                     if (SharedModel.AgentStageRankingInfos
                         .TryGetValue(states.CurrentAvatarKey, out var stageInfo))
@@ -236,6 +248,11 @@ namespace Nekoyume.UI
                     rankScroll.Show(stageRankingInfos, true);
                     break;
                 case RankCategory.Mimisburnnr:
+                    if (!isApiLoaded)
+                    {
+                        break;
+                    }
+
                     var mimisbrunnrRankingInfos = SharedModel.MimisbrunnrRankingInfos;
                     if (SharedModel.AgentMimisbrunnrRankingInfos
                         .TryGetValue(states.CurrentAvatarKey, out var mimisbrunnrInfo))
@@ -256,9 +273,7 @@ namespace Nekoyume.UI
                         Find<SystemPopup>().Show("UI_ALERT_NOT_IMPLEMENTED_TITLE", "UI_ALERT_NOT_IMPLEMENTED_CONTENT");
                         CurrentCategory = _previousCategory;
                         ToggleCategory(CurrentCategory);
-                        return;
                     }
-
                     break;
                 default:
                     break;
